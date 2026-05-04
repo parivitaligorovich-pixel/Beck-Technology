@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Estimate Dashboard — Modern Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+    /* ============================================
+       DESIGN SYSTEM
+       - Font: Roboto only (300, 400, 500, 700)
+       - Font sizes: 10, 12, 16, 20, 24, 32, 36, 40, 48, 56, 64
+       - Border-radius: 4, 8, 12, 16, 20, 24, 32
+       - Spacing: 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64
+       ============================================ */
+
+    :root {
+        /* Brand & accents */
+        --color-primary: #1B3A8F;
+        --color-primary-hover: #244BB5;
+        --color-primary-light: #E8EEFB;
+        --color-accent: #F5A623;
+
+        /* Surfaces */
+        --color-bg: #F0F4FA;
+        --color-surface: #FFFFFF;
+        --color-surface-alt: #F7F9FC;
+
+        /* Borders */
+        --color-border: #E1E6EF;
+        --color-border-strong: #CDD5E2;
+
+        /* Text */
+        --color-text: #1F2937;
+        --color-text-muted: #6B7385;
+        --color-text-disabled: #B4BBC8;
+
+        /* States */
+        --color-hover: #EEF2FA;
+        --color-active: #DDE6F7;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px rgba(15, 30, 70, 0.04);
+        --shadow-md: 0 4px 12px rgba(15, 30, 70, 0.06);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100vw;
+        height: 100vh;
+        font-family: 'Roboto', sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--color-text);
+        background: var(--color-bg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    /* ============================================
+       APP LAYOUT GRID
+       ============================================ */
+    .app {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 1fr;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .content {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+        gap: 16px;
+        padding: 16px;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .panel-placeholder {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text-disabled);
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    /* ============================================
+       COST DATABASE PANEL (left)
+       ============================================ */
+    .cost-database {
+        position: relative;
+        display: flex;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    /* Vertical "Filter" tab on the left edge */
+    .filter-tab {
+        width: 24px;
+        background: var(--color-primary-light);
+        border-right: 1px solid var(--color-border);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 16px;
+        flex-shrink: 0;
+    }
+
+    .filter-tab-label {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--color-primary);
+        letter-spacing: 1px;
+    }
+
+    .panel-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Panel header */
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: var(--color-primary);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        flex-shrink: 0;
+    }
+
+    .panel-header-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pin-btn {
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: background 0.12s ease;
+    }
+
+    .pin-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+    }
+
+    .pin-btn svg {
+        width: 14px;
+        height: 14px;
+        stroke-width: 2;
+    }
+
+    /* Sub-tabs row */
+    .sub-tabs {
+        display: flex;
+        gap: 0;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--color-border);
+        background: var(--color-surface);
+        flex-shrink: 0;
+    }
+
+    .sub-tab {
+        padding: 12px 20px;
+        background: transparent;
+        border: none;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        cursor: pointer;
+        position: relative;
+        transition: color 0.12s ease;
+    }
+
+    .sub-tab:hover {
+        color: var(--color-text);
+    }
+
+    .sub-tab.active {
+        color: var(--color-primary);
+        font-weight: 700;
+    }
+
+    .sub-tab.active::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: -1px;
+        height: 2px;
+        background: var(--color-primary);
+        border-radius: 2px 2px 0 0;
+    }
+
+    /* Search input */
+    .search-row {
+        padding: 12px 16px 8px;
+        flex-shrink: 0;
+    }
+
+    .search-input {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: var(--color-surface-alt);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 0 12px;
+        height: 32px;
+        transition: border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .search-input:focus-within {
+        border-color: var(--color-primary);
+        background: var(--color-surface);
+    }
+
+    .search-input svg {
+        width: 16px;
+        height: 16px;
+        color: var(--color-text-muted);
+        stroke-width: 2;
+        flex-shrink: 0;
+    }
+
+    .search-input input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 12px;
+        color: var(--color-text);
+        padding-left: 8px;
+    }
+
+    .search-input input::placeholder {
+        color: var(--color-text-muted);
+    }
+
+    /* Group section */
+    .group-section {
+        padding: 8px 16px 12px;
+        border-bottom: 1px solid var(--color-border);
+        flex-shrink: 0;
+    }
+
+    .group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 0;
+        margin-bottom: 8px;
+    }
+
+    .group-header-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-text);
+    }
+
+    .group-header-title svg {
+        width: 16px;
+        height: 16px;
+        color: var(--color-primary);
+        stroke-width: 1.75;
+    }
+
+    .pin-btn-dark {
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        color: var(--color-text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+    }
+
+    .pin-btn-dark:hover {
+        background: var(--color-hover);
+        color: var(--color-text);
+    }
+
+    .pin-btn-dark svg {
+        width: 14px;
+        height: 14px;
+        stroke-width: 2;
+    }
+
+    .group-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .dropdown {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 8px;
+        height: 32px;
+        padding: 0 8px 0 12px;
+        cursor: pointer;
+        transition: border-color 0.12s ease;
+    }
+
+    .dropdown:hover {
+        border-color: var(--color-primary);
+    }
+
+    .dropdown-value {
+        flex: 1;
+        font-size: 12px;
+        color: var(--color-text);
+    }
+
+    .dropdown-arrow {
+        width: 20px;
+        height: 20px;
+        background: var(--color-primary);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .dropdown-arrow svg {
+        width: 12px;
+        height: 12px;
+        stroke-width: 2.5;
+    }
+
+    .group-action-btn {
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+        flex-shrink: 0;
+    }
+
+    .group-action-btn:hover {
+        background: var(--color-hover);
+        transform: translateY(-1px);
+    }
+
+    .group-action-btn svg {
+        width: 14px;
+        height: 14px;
+        stroke-width: 2.25;
+    }
+
+    .group-action-btn.add { color: #16A34A; }
+    .group-action-btn.remove { color: #DC2626; }
+    .group-action-btn.edit { color: var(--color-primary); }
+    .group-action-btn.settings { color: var(--color-text-muted); }
+
+    /* Tree view */
+    .tree-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 4px 8px 16px;
+    }
+
+    .tree-wrapper::-webkit-scrollbar {
+        width: 8px;
+    }
+    .tree-wrapper::-webkit-scrollbar-track {
+        background: var(--color-surface-alt);
+    }
+    .tree-wrapper::-webkit-scrollbar-thumb {
+        background: var(--color-border-strong);
+        border-radius: 4px;
+    }
+
+    .tree-node {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--color-text);
+        transition: background 0.1s ease;
+        min-height: 28px;
+    }
+
+    .tree-node:hover {
+        background: var(--color-hover);
+    }
+
+    .tree-node.selected {
+        background: var(--color-primary-light);
+        color: var(--color-primary);
+        font-weight: 500;
+    }
+
+    .tree-toggle {
+        width: 16px;
+        height: 16px;
+        border: 1px solid var(--color-border-strong);
+        border-radius: 4px;
+        background: var(--color-surface);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        cursor: pointer;
+        color: var(--color-text-muted);
+    }
+
+    .tree-toggle svg {
+        width: 10px;
+        height: 10px;
+        stroke-width: 2.5;
+    }
+
+    .tree-toggle.empty {
+        border-color: transparent;
+        background: transparent;
+        cursor: default;
+    }
+
+    .tree-icon {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: var(--color-primary);
+    }
+
+    .tree-icon svg {
+        width: 16px;
+        height: 16px;
+        stroke-width: 1.75;
+    }
+
+    .tree-icon.file {
+        color: var(--color-text-muted);
+    }
+
+    .tree-children {
+        margin-left: 20px;
+    }
+
+    .tree-label {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ============================================
+       COST INFORMATION PANEL (center)
+       ============================================ */
+    .cost-information {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .cost-info-body {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+    }
+
+    /* Left sidebar with vertical tabs */
+    .info-sidebar {
+        width: 96px;
+        background: var(--color-surface-alt);
+        border-right: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 8px;
+        flex-shrink: 0;
+        gap: 12px;
+    }
+
+    .info-tab {
+        width: 72px;
+        height: 72px;
+        border-radius: 16px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-text);
+        text-align: center;
+        line-height: 1.2;
+        padding: 4px;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .info-tab:hover {
+        background: var(--color-hover);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+    }
+
+    .info-tab.active {
+        background: var(--color-primary);
+        color: #fff;
+        border-color: var(--color-primary);
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(27, 58, 143, 0.25);
+    }
+
+    /* Automatic pricing toggle (bottom of sidebar) */
+    .auto-pricing {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding-top: 16px;
+        border-top: 1px solid var(--color-border);
+        width: 100%;
+    }
+
+    .auto-pricing-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--color-text);
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .toggle {
+        position: relative;
+        width: 40px;
+        height: 20px;
+        background: #16A34A;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .toggle::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 16px;
+        height: 16px;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        transition: right 0.2s ease;
+    }
+
+    .toggle.off {
+        background: var(--color-border-strong);
+    }
+
+    .toggle.off::after {
+        right: 22px;
+    }
+
+    .toggle-state {
+        font-size: 10px;
+        font-weight: 700;
+        color: #16A34A;
+        letter-spacing: 0.5px;
+    }
+
+    .toggle.off + .toggle-state {
+        color: var(--color-text-muted);
+    }
+
+    /* Properties table */
+    .properties-table {
+        flex: 1;
+        overflow: auto;
+        background: var(--color-surface);
+    }
+
+    .properties-table::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    .properties-table::-webkit-scrollbar-track {
+        background: var(--color-surface-alt);
+    }
+    .properties-table::-webkit-scrollbar-thumb {
+        background: var(--color-border-strong);
+        border-radius: 4px;
+    }
+
+    .properties-table table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .properties-table thead th {
+        position: sticky;
+        top: 0;
+        background: var(--color-primary-light);
+        color: var(--color-primary);
+        font-weight: 700;
+        font-size: 12px;
+        text-align: left;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--color-border-strong);
+        z-index: 1;
+        white-space: nowrap;
+    }
+
+    .properties-table thead th:first-child {
+        width: 24px;
+        padding: 12px 4px 12px 12px;
+    }
+
+    .properties-table thead th:nth-child(2) {
+        width: 45%;
+    }
+
+    .properties-table tbody tr {
+        transition: background 0.1s ease;
+        cursor: pointer;
+    }
+
+    .properties-table tbody tr:nth-child(even) {
+        background: #F4F8F2;   /* subtle green tint, як у референсі */
+    }
+
+    .properties-table tbody tr:hover {
+        background: var(--color-hover);
+    }
+
+    .properties-table tbody tr.active {
+        background: var(--color-primary-light);
+    }
+
+    .properties-table td {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--color-border);
+        color: var(--color-text);
+        vertical-align: middle;
+        line-height: 1.4;
+    }
+
+    .properties-table td.row-marker {
+        width: 24px;
+        padding: 10px 4px 10px 12px;
+        color: var(--color-primary);
+        font-style: italic;
+        font-weight: 700;
+    }
+
+    .properties-table td.prop-name {
+        font-weight: 400;
+        color: var(--color-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 0;
+    }
+
+    .properties-table tr.active td.prop-name {
+        color: var(--color-primary);
+        font-weight: 500;
+    }
+
+    .properties-table td.prop-value {
+        color: var(--color-text);
+    }
+
+    .cell-with-dropdown {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .cell-dropdown-arrow {
+        width: 20px;
+        height: 20px;
+        background: var(--color-primary);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .cell-dropdown-arrow svg {
+        width: 12px;
+        height: 12px;
+        stroke-width: 2.5;
+    }
+
+    /* ============================================
+       ITEM DETAILS PANEL (right)
+       ============================================ */
+    .item-details {
+        display: flex;
+        flex-direction: column;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    /* Top section: description + unit reference */
+    .item-top {
+        padding: 16px 20px;
+        background: var(--color-surface-alt);
+        border-bottom: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .item-top-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .item-top-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-text);
+        white-space: nowrap;
+    }
+
+    .item-input {
+        flex: 1;
+        height: 32px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 8px;
+        padding: 0 12px;
+        font-family: inherit;
+        font-size: 12px;
+        color: var(--color-text);
+        outline: none;
+        transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .item-input:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(27, 58, 143, 0.1);
+    }
+
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-primary);
+        transition: background 0.12s ease, border-color 0.12s ease;
+        flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+        background: var(--color-hover);
+        border-color: var(--color-primary);
+    }
+
+    .icon-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke-width: 1.75;
+    }
+
+    .item-dropdown {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 32px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 8px;
+        padding: 0 4px 0 12px;
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--color-text);
+        gap: 8px;
+        transition: border-color 0.12s ease;
+    }
+
+    .item-dropdown:hover {
+        border-color: var(--color-primary);
+    }
+
+    .item-dropdown.compact {
+        width: 80px;
+    }
+
+    .item-dropdown.flex {
+        flex: 1;
+        justify-content: space-between;
+    }
+
+    .item-dropdown-value {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-dropdown-arrow {
+        width: 24px;
+        height: 24px;
+        background: var(--color-primary);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .item-dropdown-arrow svg {
+        width: 12px;
+        height: 12px;
+        stroke-width: 2.5;
+    }
+
+    /* Form body */
+    .item-form {
+        flex: 1;
+        padding: 24px 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 130px 1fr auto;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--color-text);
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .form-label.bold {
+        font-weight: 700;
+    }
+
+    /* Field wrapper for input + optional inline buttons inside */
+    .form-field {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 32px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .form-field:focus-within {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(27, 58, 143, 0.1);
+    }
+
+    .form-field.highlight {
+        background: var(--color-accent);
+        border-color: #D88A0F;
+    }
+
+    .form-field.highlight .form-input {
+        background: transparent;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .form-field.highlight .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .form-input {
+        flex: 1;
+        height: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        padding: 0 12px;
+        font-family: inherit;
+        font-size: 12px;
+        color: var(--color-text);
+    }
+
+    .form-input.right {
+        text-align: right;
+        font-weight: 500;
+    }
+
+    .form-field-arrow {
+        width: 24px;
+        height: 24px;
+        margin-right: 4px;
+        background: var(--color-primary);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .form-field.highlight .form-field-arrow {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .form-field-arrow svg {
+        width: 12px;
+        height: 12px;
+        stroke-width: 2.5;
+    }
+
+    /* f(x) button */
+    .fx-btn {
+        height: 32px;
+        min-width: 36px;
+        padding: 0 8px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 8px;
+        font-family: 'Roboto', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        font-style: italic;
+        color: var(--color-primary);
+        cursor: pointer;
+        transition: background 0.12s ease, border-color 0.12s ease;
+        flex-shrink: 0;
+    }
+
+    .fx-btn:hover {
+        background: var(--color-primary-light);
+        border-color: var(--color-primary);
+    }
+
+    .fx-spacer {
+        width: 36px;
+        flex-shrink: 0;
+    }
+
+    /* Add to Estimate button */
+    .item-footer {
+        padding: 8px 24px 24px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .add-to-estimate-btn {
+        background: var(--color-primary);
+        color: #fff;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+        box-shadow: 0 2px 4px rgba(27, 58, 143, 0.15);
+    }
+
+    .add-to-estimate-btn:hover {
+        background: var(--color-primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(27, 58, 143, 0.25);
+    }
+
+    .add-to-estimate-btn:active {
+        transform: translateY(0);
+    }
+    
+
+    /* ============================================
+       RIBBON — TOP NAVIGATION
+       ============================================ */
+    .ribbon {
+        background: var(--color-surface);
+        border-bottom: 1px solid var(--color-border);
+        box-shadow: var(--shadow-sm);
+        user-select: none;
+    }
+
+    /* --- Tabs row --- */
+    .ribbon-tabs {
+        display: flex;
+        align-items: flex-end;
+        background: var(--color-primary);
+        padding: 0 24px;
+        height: 40px;
+        gap: 4px;
+    }
+
+    .ribbon-tab {
+        position: relative;
+        padding: 8px 20px;
+        font-size: 12px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.78);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        transition: background 0.15s ease, color 0.15s ease;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        letter-spacing: 0.2px;
+        font-family: inherit;
+    }
+
+    .ribbon-tab:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+    }
+
+    .ribbon-tab.active {
+        background: var(--color-surface);
+        color: var(--color-primary);
+        font-weight: 700;
+        height: 36px;
+    }
+
+    .ribbon-tab.active::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 2px;
+        background: var(--color-surface);
+    }
+
+    /* --- Tools row --- */
+    .ribbon-tools {
+        display: flex;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 12px 24px 8px;
+        gap: 0;
+        background: var(--color-surface);
+        min-height: 110px;
+        width: 100%;
+    }
+
+    .tool-group {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0 8px;
+        position: relative;
+        min-width: 80px;
+    }
+
+    .tool-group + .tool-group {
+        margin-left: 0;
+    }
+
+    .tool-group + .tool-group::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 24px;
+        width: 1px;
+        background: var(--color-border);
+    }
+
+    .tool-group-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        flex: 1;
+        padding-bottom: 8px;
+    }
+
+    .tool-group-label {
+        text-align: center;
+        font-size: 10px;
+        font-weight: 400;
+        color: var(--color-text-muted);
+        letter-spacing: 0.4px;
+        padding-top: 4px;
+        border-top: 1px solid var(--color-border);
+        margin-top: 2px;
+    }
+
+    /* --- Tool button (large) --- */
+    .tool-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 4px;
+        padding: 8px 8px;
+        min-width: 64px;
+        max-width: 84px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--color-text);
+        transition: background 0.12s ease, border-color 0.12s ease;
+        font-family: inherit;
+    }
+
+    .tool-btn:hover:not(:disabled) {
+        background: var(--color-hover);
+        border-color: var(--color-border);
+    }
+
+    .tool-btn:active:not(:disabled) {
+        background: var(--color-active);
+    }
+
+    .tool-btn:disabled {
+        color: var(--color-text-disabled);
+        cursor: not-allowed;
+    }
+
+    .tool-btn:disabled .tool-btn-icon {
+        color: var(--color-text-disabled);
+        opacity: 0.6;
+    }
+
+    .tool-btn-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-primary);
+    }
+
+    .tool-btn-icon svg {
+        width: 24px;
+        height: 24px;
+        stroke-width: 1.75;
+    }
+
+    .tool-btn-label {
+        font-size: 10px;
+        font-weight: 400;
+        line-height: 1.2;
+        text-align: center;
+        max-width: 80px;
+        word-wrap: break-word;
+    }
+
+    /* --- Small tool button (compact) --- */
+    .tool-btn-sm {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--color-text);
+        height: 24px;
+        transition: background 0.12s ease, border-color 0.12s ease;
+        white-space: nowrap;
+    }
+
+    .tool-btn-sm:hover:not(:disabled) {
+        background: var(--color-hover);
+        border-color: var(--color-border);
+    }
+
+    .tool-btn-sm:disabled {
+        color: var(--color-text-disabled);
+        cursor: not-allowed;
+    }
+
+    .tool-btn-sm:disabled .tool-btn-sm-icon {
+        opacity: 0.5;
+        color: var(--color-text-disabled);
+    }
+
+    .tool-btn-sm-icon {
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-primary);
+        flex-shrink: 0;
+    }
+
+    .tool-btn-sm-icon svg {
+        width: 16px;
+        height: 16px;
+        stroke-width: 1.75;
+    }
+
+    /* --- Stack of small buttons (vertical) --- */
+    .tool-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        justify-content: center;
+        padding: 4px 0;
+    }
+
+    /* --- Rate Tables: list selector --- */
+    .rate-tables-list {
+        width: 130px;
+        height: 80px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 8px;
+        overflow-y: auto;
+        font-size: 12px;
+        box-shadow: inset 0 1px 2px rgba(15, 30, 70, 0.04);
+    }
+
+    .rate-tables-list::-webkit-scrollbar {
+        width: 8px;
+    }
+    .rate-tables-list::-webkit-scrollbar-track {
+        background: var(--color-surface-alt);
+        border-radius: 0 8px 8px 0;
+    }
+    .rate-tables-list::-webkit-scrollbar-thumb {
+        background: var(--color-border-strong);
+        border-radius: 4px;
+    }
+
+    .rate-table-item {
+        padding: 4px 12px;
+        cursor: pointer;
+        line-height: 20px;
+        color: var(--color-text);
+        border-left: 2px solid transparent;
+    }
+
+    .rate-table-item:hover {
+        background: var(--color-hover);
+    }
+
+    .rate-table-item.selected {
+        background: var(--color-primary-light);
+        color: var(--color-primary);
+        font-weight: 500;
+        border-left-color: var(--color-primary);
+    }
+
+    /* --- Bid Day "B" brand button --- */
+    .brand-btn {
+        width: 56px;
+        height: 56px;
+        background: var(--color-primary);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 32px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease, transform 0.15s ease;
+        box-shadow: var(--shadow-sm);
+        flex-shrink: 0;
+    }
+
+    .brand-btn:hover {
+        background: var(--color-primary-hover);
+        transform: translateY(-1px);
+    }
+
+    .bid-day-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .bid-day-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding-top: 2px;
+    }
+
+    /* Procore icon button */
+    .procore-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 80px;
+        padding: 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: not-allowed;
+        color: var(--color-text-disabled);
+        font-family: inherit;
+    }
+
+    .procore-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #E89B2C, #F5A623);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        opacity: 0.5;
+    }
+
+    .procore-btn-label {
+        font-size: 10px;
+        line-height: 1.2;
+        text-align: center;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- ========== RIBBON ========== -->
+    <header class="ribbon">
+
+        <!-- Top tabs -->
+        <nav class="ribbon-tabs" aria-label="Main sections">
+            <button class="ribbon-tab">Home</button>
+            <button class="ribbon-tab">Project</button>
+            <button class="ribbon-tab active">Estimate</button>
+            <button class="ribbon-tab">Rates &amp; Resources</button>
+            <button class="ribbon-tab">Dashboard</button>
+            <button class="ribbon-tab">Insert</button>
+            <button class="ribbon-tab">View</button>
+            <button class="ribbon-tab">Comparison</button>
+            <button class="ribbon-tab">Takeoff</button>
+        </nav>
+
+        <!-- Tools row -->
+        <div class="ribbon-tools">
+
+            <!-- GROUP: Estimate -->
+            <div class="tool-group">
+                <div class="tool-group-content">
+                    <button class="tool-btn" title="Save 0 Changes">
+                        <span class="tool-btn-icon"><i data-lucide="save"></i></span>
+                        <span class="tool-btn-label">Save 0<br>Changes</span>
+                    </button>
+                    <button class="tool-btn" title="Refresh">
+                        <span class="tool-btn-icon"><i data-lucide="refresh-cw"></i></span>
+                        <span class="tool-btn-label">Refresh</span>
+                    </button>
+                    <button class="tool-btn" title="Create One-off Line Item">
+                        <span class="tool-btn-icon"><i data-lucide="file-plus"></i></span>
+                        <span class="tool-btn-label">Create One-off<br>Line Item</span>
+                    </button>
+                </div>
+                <div class="tool-group-label">Estimate</div>
+            </div>
+
+            <!-- GROUP: Line Item -->
+            <div class="tool-group">
+                <div class="tool-group-content">
+                    <div class="tool-stack">
+                        <button class="tool-btn-sm" disabled>
+                            <span class="tool-btn-sm-icon"><i data-lucide="x"></i></span>
+                            <span>Remove Cost</span>
+                        </button>
+                        <button class="tool-btn-sm" disabled>
+                            <span class="tool-btn-sm-icon"><i data-lucide="copy"></i></span>
+                            <span>Copy Line Item</span>
+                        </button>
+                    </div>
+                    <button class="tool-btn" disabled title="Set Escalation">
+                        <span class="tool-btn-icon"><i data-lucide="trending-up"></i></span>
+                        <span class="tool-btn-label">Set<br>Escalation</span>
+                    </button>
+                    <button class="tool-btn" disabled title="Productivity Adjustment">
+                        <span class="tool-btn-icon"><i data-lucide="sliders-horizontal"></i></span>
+                        <span class="tool-btn-label">Productivity<br>Adjustment</span>
+                    </button>
+                </div>
+                <div class="tool-group-label">Line Item</div>
+            </div>
+
+            <!-- GROUP: Other -->
+            <div class="tool-group">
+                <div class="tool-group-content">
+                    <button class="tool-btn" title="Fees">
+                        <span class="tool-btn-icon"><i data-lucide="dollar-sign"></i></span>
+                        <span class="tool-btn-label">Fees</span>
+                    </button>
+                    <button class="tool-btn" title="WBS Properties">
+                        <span class="tool-btn-icon"><i data-lucide="layout-grid"></i></span>
+                        <span class="tool-btn-label">WBS<br>Properties</span>
+                    </button>
+                    <button class="tool-btn" title="Highlight Rules">
+                        <span class="tool-btn-icon"><i data-lucide="highlighter"></i></span>
+                        <span class="tool-btn-label">Highlight<br>Rules</span>
+                    </button>
+                    <button class="tool-btn" title="Audit Trail">
+                        <span class="tool-btn-icon"><i data-lucide="history"></i></span>
+                        <span class="tool-btn-label">Audit<br>Trail</span>
+                    </button>
+                </div>
+                <div class="tool-group-label">Other</div>
+            </div>
+
+            <!-- GROUP: Excel Report -->
+            <div class="tool-group">
+                <div class="tool-group-content">
+                    <button class="tool-btn" title="From Estimate View">
+                        <span class="tool-btn-icon"><i data-lucide="file-spreadsheet"></i></span>
+                        <span class="tool-btn-label">From Estimate<br>View</span>
+                    </button>
+                </div>
+                <div class="tool-group-label">Excel Report</div>
+            </div>
+
+            <!-- GROUP: Rate Tables -->
+            <div class="tool-group">
+                <div class="tool-group-content" style="align-items: center;">
+                    <div class="rate-tables-list" role="listbox" aria-label="Rate tables">
+                        <div class="rate-table-item selected">Default</div>
+                        <div class="rate-table-item">Scale 1</div>
+                        <div class="rate-table-item">Scale 2</div>
+                        <div class="rate-table-item">Scale 3</div>
+                        <div class="rate-table-item">Scale 4</div>
+                        <div class="rate-table-item">Scale 5</div>
+                    </div>
+                </div>
+                <div class="tool-group-label">Rate Tables</div>
+            </div>
+
+            <!-- GROUP: Procore -->
+            <div class="tool-group">
+                <div class="tool-group-content">
+                    <button class="procore-btn" disabled title="Upload to Financials">
+                        <span class="procore-icon">
+                            <i data-lucide="cloud-upload" style="width:20px;height:20px;"></i>
+                        </span>
+                        <span class="procore-btn-label">Upload to<br>Financials</span>
+                    </button>
+                </div>
+                <div class="tool-group-label">Procore</div>
+            </div>
+
+            <!-- GROUP: Bid Day -->
+            <div class="tool-group">
+                <div class="tool-group-content">
+                    <div class="bid-day-row">
+                        <button class="brand-btn" title="Create Project">B</button>
+                        <div class="bid-day-stack">
+                            <button class="tool-btn-sm" disabled>
+                                <span class="tool-btn-sm-icon"><i data-lucide="upload"></i></span>
+                                <span>Push Items</span>
+                            </button>
+                            <button class="tool-btn-sm" disabled>
+                                <span class="tool-btn-sm-icon"><i data-lucide="download"></i></span>
+                                <span>Pull Items</span>
+                            </button>
+                            <button class="tool-btn-sm">
+                                <span class="tool-btn-sm-icon"><i data-lucide="folder-plus"></i></span>
+                                <span>Create Project</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-group-label">Bid Day</div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ========== CONTENT GRID ========== -->
+    <main class="content">
+
+        <!-- ========== COST DATABASE PANEL ========== -->
+        <section class="cost-database" aria-label="Cost Database">
+
+            <!-- Vertical Filter tab -->
+            <div class="filter-tab" title="Filter">
+                <span class="filter-tab-label">Filter</span>
+            </div>
+
+            <div class="panel-body">
+
+                <!-- Header -->
+                <div class="panel-header">
+                    <div class="panel-header-title">
+                        <span>Cost Database</span>
+                    </div>
+                    <button class="pin-btn" title="Pin panel">
+                        <i data-lucide="pin"></i>
+                    </button>
+                </div>
+
+                <!-- Sub-tabs -->
+                <div class="sub-tabs">
+                    <button class="sub-tab active">Line Item</button>
+                    <button class="sub-tab">Assembly</button>
+                </div>
+
+                <!-- Search -->
+                <div class="search-row">
+                    <label class="search-input">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Find" />
+                    </label>
+                </div>
+
+                <!-- Group section -->
+                <div class="group-section">
+                    <div class="group-header">
+                        <div class="group-header-title">
+                            <i data-lucide="folder"></i>
+                            <span>Group</span>
+                        </div>
+                        <button class="pin-btn-dark" title="Pin group">
+                            <i data-lucide="pin"></i>
+                        </button>
+                    </div>
+
+                    <div class="group-controls">
+                        <div class="dropdown" tabindex="0">
+                            <span class="dropdown-value">Masterformat Level 2</span>
+                            <span class="dropdown-arrow">
+                                <i data-lucide="chevron-down"></i>
+                            </span>
+                        </div>
+                        <button class="group-action-btn add" title="Add group">
+                            <i data-lucide="plus"></i>
+                        </button>
+                        <button class="group-action-btn remove" title="Remove group">
+                            <i data-lucide="minus"></i>
+                        </button>
+                        <button class="group-action-btn edit" title="Edit group">
+                            <i data-lucide="pencil"></i>
+                        </button>
+                        <button class="group-action-btn settings" title="Settings">
+                            <i data-lucide="settings"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tree -->
+                <div class="tree-wrapper">
+
+                    <div class="tree-node">
+                        <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                        <span class="tree-icon"><i data-lucide="folder"></i></span>
+                        <span class="tree-label">04 00 00 MASONRY</span>
+                    </div>
+
+                    <div class="tree-node">
+                        <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                        <span class="tree-icon"><i data-lucide="folder"></i></span>
+                        <span class="tree-label">05 00 00 METALS</span>
+                    </div>
+
+                    <div class="tree-node">
+                        <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                        <span class="tree-icon"><i data-lucide="folder"></i></span>
+                        <span class="tree-label">06 00 00 WOOD, PLASTICS, AND COMPOSITES</span>
+                    </div>
+
+                    <div class="tree-node">
+                        <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                        <span class="tree-icon"><i data-lucide="folder"></i></span>
+                        <span class="tree-label">07 00 00 THERMAL AND MOISTURE PROTECTION</span>
+                    </div>
+
+                    <div class="tree-node">
+                        <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                        <span class="tree-icon"><i data-lucide="folder"></i></span>
+                        <span class="tree-label">08 00 00 OPENINGS</span>
+                    </div>
+
+                    <!-- Expanded: 09 00 00 FINISHES -->
+                    <div class="tree-node">
+                        <span class="tree-toggle"><i data-lucide="minus"></i></span>
+                        <span class="tree-icon"><i data-lucide="folder-open"></i></span>
+                        <span class="tree-label">09 00 00 FINISHES</span>
+                    </div>
+
+                    <div class="tree-children">
+                        <div class="tree-node">
+                            <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                            <span class="tree-icon"><i data-lucide="folder"></i></span>
+                            <span class="tree-label">09 05 00 Common Work Results for Finishes</span>
+                        </div>
+
+                        <div class="tree-node">
+                            <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                            <span class="tree-icon"><i data-lucide="folder"></i></span>
+                            <span class="tree-label">09 20 00 Plaster and Gypsum Board</span>
+                        </div>
+
+                        <div class="tree-node">
+                            <span class="tree-toggle"><i data-lucide="plus"></i></span>
+                            <span class="tree-icon"><i data-lucide="folder"></i></span>
+                            <span class="tree-label">09 30 00 Tiling</span>
+                        </div>
+
+                        <!-- Expanded: 09 50 00 Ceilings -->
+                        <div class="tree-node">
+                            <span class="tree-toggle"><i data-lucide="minus"></i></span>
+                            <span class="tree-icon"><i data-lucide="folder-open"></i></span>
+                            <span class="tree-label">09 50 00 Ceilings</span>
+                        </div>
+
+                        <div class="tree-children">
+                            <div class="tree-node selected">
+                                <span class="tree-toggle empty"></span>
+                                <span class="tree-icon file"><i data-lucide="file-text"></i></span>
+                                <span class="tree-label">09500.000 Acoustical - ceiling tiles - 2' x 2' with grid</span>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-toggle empty"></span>
+                                <span class="tree-icon file"><i data-lucide="file-text"></i></span>
+                                <span class="tree-label">09500.010 Acoustical - ceiling tiles - 2' x 4' with grid</span>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-toggle empty"></span>
+                                <span class="tree-icon file"><i data-lucide="file-text"></i></span>
+                                <span class="tree-label">09500.020 Acoustical - sprayed plaster system</span>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-toggle empty"></span>
+                                <span class="tree-icon file"><i data-lucide="file-text"></i></span>
+                                <span class="tree-label">09500.030 Acoustical - wood ceiling system</span>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-toggle empty"></span>
+                                <span class="tree-icon file"><i data-lucide="file-text"></i></span>
+                                <span class="tree-label">09500.040 Flooring - acrylic system</span>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-toggle empty"></span>
+                                <span class="tree-icon file"><i data-lucide="file-text"></i></span>
+                                <span class="tree-label">09500.050 Metal pan ceiling</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========== COST INFORMATION PANEL ========== -->
+        <section class="cost-information" aria-label="Cost Information">
+
+            <!-- Header -->
+            <div class="panel-header">
+                <div class="panel-header-title">
+                    <span>Cost Information</span>
+                </div>
+                <button class="pin-btn" title="Pin panel">
+                    <i data-lucide="pin"></i>
+                </button>
+            </div>
+
+            <div class="cost-info-body">
+
+                <!-- Vertical sidebar with tabs -->
+                <aside class="info-sidebar">
+                    <button class="info-tab active">WBS</button>
+                    <button class="info-tab">QTO<br>Prop</button>
+                    <button class="info-tab">Asm<br>Items</button>
+
+                    <div class="auto-pricing">
+                        <span class="auto-pricing-label">Automatic<br>Pricing</span>
+                        <div class="toggle" role="switch" aria-checked="true" tabindex="0"></div>
+                        <span class="toggle-state">ON</span>
+                    </div>
+                </aside>
+
+                <!-- Properties table -->
+                <div class="properties-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="th-marker"></th>
+                                <th>WBS Property Name</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="active">
+                                <td class="row-marker">I</td>
+                                <td class="prop-name">System</td>
+                                <td class="prop-value">
+                                    <div class="cell-with-dropdown">
+                                        <span>Phase 1</span>
+                                        <span class="cell-dropdown-arrow"><i data-lucide="chevron-down"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Alternate Name</td>
+                                <td class="prop-value">Base Bid</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Alternate Status</td>
+                                <td class="prop-value">Base Bid</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">CSI Level 1</td>
+                                <td class="prop-value">09 FINISHES</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">CSI Level 2</td>
+                                <td class="prop-value">09500 Ceilings</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Database Control...</td>
+                                <td class="prop-value">0967</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Masterformat Leve...</td>
+                                <td class="prop-value">09 00 00 FINISHES</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Masterformat Leve...</td>
+                                <td class="prop-value">09 50 00 Ceilings</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Masterformat Leve...</td>
+                                <td class="prop-value">09 51 00 Acoustical...</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Uniformat Level 1</td>
+                                <td class="prop-value">C INTERIORS</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Uniformat Level 2</td>
+                                <td class="prop-value">C30 Interior Finishes</td>
+                            </tr>
+                            <tr>
+                                <td class="row-marker"></td>
+                                <td class="prop-name">Uniformat Level 3</td>
+                                <td class="prop-value">C3030 Ceiling Finis...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========== ITEM DETAILS PANEL ========== -->
+        <section class="item-details" aria-label="Item Details">
+
+            <!-- Top: Description + Unit Reference -->
+            <div class="item-top">
+                <div class="item-top-row">
+                    <span class="item-top-label">Description:</span>
+                    <input type="text" class="item-input" value="Acoustical - ceiling tiles - 2' x 2' with grid" />
+                    <button class="icon-btn" title="History">
+                        <i data-lucide="history"></i>
+                    </button>
+                </div>
+                <div class="item-top-row">
+                    <div class="item-dropdown compact">
+                        <span class="item-dropdown-value">sf</span>
+                        <span class="item-dropdown-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <span class="item-top-label">/ Unit Reference:</span>
+                    <div class="item-dropdown flex">
+                        <span class="item-dropdown-value">Total Building Area</span>
+                        <span class="item-dropdown-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="item-form">
+
+                <div class="form-row">
+                    <span class="form-label">Item Number:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input" value="09500.000" />
+                    </div>
+                    <div class="fx-spacer"></div>
+                </div>
+
+                <div class="form-row">
+                    <span class="form-label bold">Quantity:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input" value="0.00" />
+                    </div>
+                    <button class="fx-btn">f(x)</button>
+                </div>
+
+                <div class="form-row" style="margin-top: 8px;">
+                    <span class="form-label">Rate Table:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input" value="Default" readonly />
+                        <span class="form-field-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <div class="fx-spacer"></div>
+                </div>
+
+                <div class="form-row">
+                    <span class="form-label">Labor Cost:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input" value="$0.00" />
+                        <span class="form-field-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <button class="fx-btn">f(x)</button>
+                </div>
+
+                <div class="form-row">
+                    <span class="form-label">Material Cost:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input" value="$0.00" />
+                        <span class="form-field-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <button class="fx-btn">f(x)</button>
+                </div>
+
+                <div class="form-row">
+                    <span class="form-label">Equipment Cost:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input" value="$0.00" />
+                        <span class="form-field-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <button class="fx-btn">f(x)</button>
+                </div>
+
+                <div class="form-row">
+                    <span class="form-label">Sub Cost:</span>
+                    <div class="form-field highlight">
+                        <input type="text" class="form-input" value="$17.50" />
+                        <span class="form-field-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <button class="fx-btn">f(x)</button>
+                </div>
+
+                <div class="form-row">
+                    <span class="form-label">Other Cost:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input" value="$0.00" />
+                        <span class="form-field-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <button class="fx-btn">f(x)</button>
+                </div>
+
+                <div class="form-row" style="margin-top: 8px;">
+                    <span class="form-label bold">Total Cost:</span>
+                    <div class="form-field">
+                        <input type="text" class="form-input right" value="$0.00" readonly />
+                        <span class="form-field-arrow"><i data-lucide="chevron-down"></i></span>
+                    </div>
+                    <div class="fx-spacer"></div>
+                </div>
+
+            </div>
+
+            <!-- Footer button -->
+            <div class="item-footer">
+                <button class="add-to-estimate-btn">Add To Estimate</button>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>
